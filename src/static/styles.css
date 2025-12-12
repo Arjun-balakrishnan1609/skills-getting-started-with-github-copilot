@@ -142,3 +142,62 @@ footer {
   padding: 20px;
   color: #666;
 }
+
+/* Add nicer participants list styling */
+.participants-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.participants-count {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.participants {
+  list-style: disc;
+  margin: 8px 0 0 20px;
+  padding: 0;
+  color: #444;
+}
+
+.participants li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 0.95rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.04);
+}
+
+.no-participants {
+  color: #777;
+  font-style: italic;
+  list-style: none;
+  padding-left: 0;
+  border-bottom: none;
+}
+
+.participant-badge {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  background: #1a237e;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Tiny email text so layout is clean */
+.participant-email {
+  color: #222;
+  font-size: 0.95rem;
+}

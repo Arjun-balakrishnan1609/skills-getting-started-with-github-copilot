@@ -46,5 +46,139 @@
     </footer>
 
     <script src="app.js"></script>
+    <script>
+      // Inline enhancement to render activity cards with participants and handle signups
+      document.addEventListener('DOMContentLoaded', () => {
+        const activitiesList = document.getElementById('activities-list');
+        const select = document.getElementById('activity');
+        const messageEl = document.getElementById('message');
+        const form = document.getElementById('signup-form');
+
+        const showMessage = (text, kind = 'info') => {
+          messageEl.className = `message ${kind}`;
+          messageEl.textContent = text;
+          messageEl.classList.remove('hidden');
+          setTimeout(() => messageEl.classList.add('hidden'), 4000);
+        };
+
+        async function loadActivities() {
+          activitiesList.innerHTML = '';
+          select.innerHTML = '<option value="">-- Select an activity --</option>';
+          try {
+            const res = await fetch('/activities');
+            if (!res.ok) throw new Error('Failed to load activities');
+            const data = await res.json();
+
+            // Sort activities alphabetically
+            const names = Object.keys(data).sort();
+            names.forEach(name => {
+              const a = data[name];
+
+              // Populate select
+              const opt = document.createElement('option');
+              opt.value = name;
+              opt.textContent = name;
+              select.appendChild(opt);
+
+              // Build card
+              const card = document.createElement('div');
+              card.className = 'activity-card';
+
+              const title = document.createElement('h4');
+              title.textContent = name;
+              card.appendChild(title);
+
+              const desc = document.createElement('p');
+              desc.textContent = a.description;
+              card.appendChild(desc);
+
+              const schedule = document.createElement('p');
+              schedule.className = 'activity-schedule';
+              schedule.textContent = `Schedule: ${a.schedule}`;
+              card.appendChild(schedule);
+
+              // Participants heading + count
+              const participantsHeading = document.createElement('div');
+              participantsHeading.className = 'participants-heading';
+              const ph = document.createElement('strong');
+              ph.textContent = 'Participants';
+              participantsHeading.appendChild(ph);
+
+              const count = document.createElement('span');
+              count.className = 'participants-count';
+              count.textContent = ` (${(a.participants || []).length})`;
+              participantsHeading.appendChild(count);
+
+              card.appendChild(participantsHeading);
+
+              const ul = document.createElement('ul');
+              ul.className = 'participants';
+              if (!a.participants || a.participants.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No participants yet';
+                li.className = 'no-participants';
+                ul.appendChild(li);
+              } else {
+                a.participants.forEach(email => {
+                  const li = document.createElement('li');
+
+                  // little badge with initials
+                  const badge = document.createElement('span');
+                  badge.className = 'participant-badge';
+                  const initials = email.split('@')[0].split(/[._-]/).map(s => s[0] || '').slice(0,2).join('').toUpperCase();
+                  badge.textContent = initials || '?';
+                  li.appendChild(badge);
+
+                  const span = document.createElement('span');
+                  span.className = 'participant-email';
+                  span.textContent = email;
+                  li.appendChild(span);
+
+                  ul.appendChild(li);
+                });
+              }
+              card.appendChild(ul);
+
+              activitiesList.appendChild(card);
+            });
+          } catch (err) {
+            activitiesList.innerHTML = '<p class="error">Failed to load activities. Try again later.</p>';
+            console.error(err);
+          }
+        }
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('email').value.trim();
+          const activityName = document.getElementById('activity').value;
+          if (!email) {
+            showMessage('Please provide a valid email', 'error');
+            return;
+          }
+          if (!activityName) {
+            showMessage('Please select an activity', 'error');
+            return;
+          }
+
+          try {
+            const url = `/activities/${encodeURIComponent(activityName)}/signup?email=${encodeURIComponent(email)}`;
+            const res = await fetch(url, { method: 'POST' });
+            const data = await res.json();
+            if (!res.ok) {
+              showMessage(data.detail || 'Failed to sign up', 'error');
+              return;
+            }
+            showMessage(data.message || 'Signed up successfully', 'success');
+            form.reset();
+            await loadActivities(); // refresh participants list
+          } catch (err) {
+            console.error(err);
+            showMessage('Error while signing up', 'error');
+          }
+        });
+
+        loadActivities();
+      });
+    </script>
   </body>
 </html>
