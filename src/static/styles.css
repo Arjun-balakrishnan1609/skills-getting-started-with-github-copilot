@@ -159,8 +159,8 @@ footer {
 }
 
 .participants {
-  list-style: disc;
-  margin: 8px 0 0 20px;
+  list-style: none;
+  margin: 8px 0 0 0;
   padding: 0;
   color: #444;
 }
@@ -172,6 +172,21 @@ footer {
   padding: 6px 0;
   font-size: 0.95rem;
   border-bottom: 1px dashed rgba(0, 0, 0, 0.04);
+}
+
+.participant-remove {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #c62828;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.participant-remove:hover {
+  background-color: rgba(198, 40, 40, 0.08);
 }
 
 .no-participants {
